@@ -29,7 +29,7 @@ export default function App() {
   const [seed, setSeed] = useState(0);
 
   const { dark, toggle: toggleDark } = useDarkMode();
-  const { elapsed, running, waiting, start, startDelayed, pause, reset } = useTimer();
+  const { elapsed, running, start, pause, reset } = useTimer();
   const fontSize = useFontSize();
 
   const exitFocus = useCallback(() => {
@@ -72,12 +72,8 @@ export default function App() {
   }, [reset, columns]);
 
   const handleTimerGo = useCallback(() => {
-    if (elapsed > 0) {
-      start();
-    } else {
-      startDelayed(1000);
-    }
-  }, [elapsed, start, startDelayed]);
+    start();
+  }, [start]);
 
   const handleNavigate = useCallback(
     (next: AppView) => {
@@ -106,7 +102,6 @@ export default function App() {
         dark={dark}
         elapsed={elapsed}
         timerVisible={focusMode}
-        timerWaiting={waiting}
         timerRunning={running}
         onNavigate={handleNavigate}
         onToggleDark={toggleDark}
@@ -121,7 +116,6 @@ export default function App() {
             {!focusMode && (
               <Timer
                 running={running}
-                waiting={waiting}
                 onStart={handleStart}
                 onPause={pause}
                 onReset={handleReset}

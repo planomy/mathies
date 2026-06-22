@@ -3,43 +3,24 @@ import { splitTime } from '../hooks/useTimer';
 interface SidebarTimerProps {
   elapsed: number;
   visible: boolean;
-  waiting: boolean;
   running: boolean;
   onGo: () => void;
   onStop: () => void;
 }
 
-export function SidebarTimer({
-  elapsed,
-  visible,
-  waiting,
-  running,
-  onGo,
-  onStop,
-}: SidebarTimerProps) {
+export function SidebarTimer({ elapsed, visible, running, onGo, onStop }: SidebarTimerProps) {
   if (!visible) return null;
 
   const { minutes, seconds, centiseconds } = splitTime(elapsed);
-  const active = running || waiting;
-  const status = waiting
-    ? 'Ready'
-    : running
-      ? 'Running'
-      : elapsed > 0
-        ? 'Paused'
-        : 'Ready';
+  const status = running ? 'Running' : elapsed > 0 ? 'Paused' : 'Idle';
 
   return (
-    <div
-      className={`sidebar-timer ${waiting ? 'is-ready' : ''} ${running ? 'is-running' : ''}`}
-    >
+    <div className={`sidebar-timer ${running ? 'is-running' : ''}`}>
       <div className="sidebar-timer-card">
         <div className="sidebar-timer-header">
           <span className="sidebar-timer-title">Timer</span>
-          <span
-            className={`sidebar-timer-badge ${running && !waiting ? 'sidebar-timer-badge--live' : ''}`}
-          >
-            {running && !waiting && <span className="sidebar-timer-pulse" aria-hidden="true" />}
+          <span className={`sidebar-timer-badge ${running ? 'sidebar-timer-badge--live' : ''}`}>
+            {running && <span className="sidebar-timer-pulse" aria-hidden="true" />}
             {status}
           </span>
         </div>
@@ -47,29 +28,23 @@ export function SidebarTimer({
         <div
           className="sidebar-timer-face"
           aria-live="polite"
-          aria-label={
-            waiting ? 'Ready' : `Elapsed time ${minutes} minutes, ${seconds} seconds`
-          }
+          aria-label={`Elapsed time ${minutes} minutes, ${seconds} seconds`}
         >
-          {waiting ? (
-            <span className="sidebar-timer-ready">Ready</span>
-          ) : (
-            <div className="sidebar-timer-digits">
-              <span className="sidebar-timer-main">{minutes}</span>
-              <span className="sidebar-timer-sep">:</span>
-              <span className="sidebar-timer-main">{seconds}</span>
-              <span className="sidebar-timer-cents">.{centiseconds}</span>
-            </div>
-          )}
+          <div className="sidebar-timer-digits">
+            <span className="sidebar-timer-main">{minutes}</span>
+            <span className="sidebar-timer-sep">:</span>
+            <span className="sidebar-timer-main">{seconds}</span>
+            <span className="sidebar-timer-cents">.{centiseconds}</span>
+          </div>
         </div>
 
         <button
           type="button"
-          className={`sidebar-timer-action ${active ? 'sidebar-timer-stop' : 'sidebar-timer-go'}`}
-          onClick={active ? onStop : onGo}
-          aria-label={active ? 'Stop timer' : 'Start timer'}
+          className={`sidebar-timer-action ${running ? 'sidebar-timer-stop' : 'sidebar-timer-go'}`}
+          onClick={running ? onStop : onGo}
+          aria-label={running ? 'Stop timer' : 'Start timer'}
         >
-          {active ? (
+          {running ? (
             <>
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <rect x="7" y="7" width="10" height="10" rx="1.5" />

@@ -7,7 +7,6 @@ interface SidebarProps {
   dark: boolean;
   elapsed: number;
   timerVisible: boolean;
-  timerWaiting: boolean;
   timerRunning: boolean;
   onNavigate: (view: AppView) => void;
   onToggleDark: () => void;
@@ -21,7 +20,6 @@ export function Sidebar({
   dark,
   elapsed,
   timerVisible,
-  timerWaiting,
   timerRunning,
   onNavigate,
   onToggleDark,
@@ -65,7 +63,6 @@ export function Sidebar({
       <SidebarTimer
         elapsed={elapsed}
         visible={timerVisible}
-        waiting={timerWaiting}
         running={timerRunning}
         onGo={onGoTimer}
         onStop={onStopTimer}

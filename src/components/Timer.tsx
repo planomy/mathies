@@ -1,16 +1,13 @@
 interface TimerProps {
   running: boolean;
-  waiting: boolean;
   onStart: () => void;
   onPause: () => void;
   onReset: () => void;
   focusMode?: boolean;
 }
 
-export function Timer({ running, waiting, onStart, onPause, onReset, focusMode }: TimerProps) {
+export function Timer({ running, onStart, onPause, onReset, focusMode }: TimerProps) {
   if (focusMode) return null;
-
-  const busy = running || waiting;
 
   return (
     <div className="setup-controls">
@@ -19,7 +16,7 @@ export function Timer({ running, waiting, onStart, onPause, onReset, focusMode }
         starts the sidebar timer with Go when ready.
       </p>
       <div className="setup-controls-buttons">
-        {busy ? (
+        {running ? (
           <button className="btn btn-setup btn-setup-pause" type="button" onClick={onPause}>
             <svg viewBox="0 0 24 24" fill="currentColor">
               <rect x="6" y="4" width="4" height="16" rx="1" />

@@ -3,11 +3,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 export function useTimer() {
   const [elapsed, setElapsed] = useState(0);
   const [running, setRunning] = useState(false);
-  const [waiting, setWaiting] = useState(false);
   const startTimeRef = useRef<number | null>(null);
   const accumulatedRef = useRef(0);
   const frameRef = useRef<number>(0);
-  const delayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const tick = useCallback(() => {
     if (startTimeRef.current !== null) {
@@ -23,39 +21,14 @@ export function useTimer() {
     return () => cancelAnimationFrame(frameRef.current);
   }, [running, tick]);
 
-  useEffect(() => {
-    return () => {
-      if (delayRef.current) clearTimeout(delayRef.current);
-    };
-  }, []);
-
   const start = useCallback(() => {
-    if (!running && !waiting) {
+    if (!running) {
       startTimeRef.current = performance.now();
       setRunning(true);
     }
-  }, [running, waiting]);
-
-  const startDelayed = useCallback(
-    (delayMs = 1000) => {
-      if (running || waiting) return;
-      setWaiting(true);
-      delayRef.current = setTimeout(() => {
-        delayRef.current = null;
-        setWaiting(false);
-        startTimeRef.current = performance.now();
-        setRunning(true);
-      }, delayMs);
-    },
-    [running, waiting],
-  );
+  }, [running]);
 
   const pause = useCallback(() => {
-    if (delayRef.current) {
-      clearTimeout(delayRef.current);
-      delayRef.current = null;
-      setWaiting(false);
-    }
     if (running && startTimeRef.current !== null) {
       accumulatedRef.current += performance.now() - startTimeRef.current;
       startTimeRef.current = null;
@@ -64,21 +37,14 @@ export function useTimer() {
   }, [running]);
 
   const reset = useCallback(() => {
-    if (delayRef.current) {
-      clearTimeout(delayRef.current);
-      delayRef.current = null;
-    }
     cancelAnimationFrame(frameRef.current);
     startTimeRef.current = null;
     accumulatedRef.current = 0;
     setElapsed(0);
     setRunning(false);
-    setWaiting(false);
   }, []);
 
-  const active = running || waiting;
-
-  return { elapsed, running, waiting, active, start, startDelayed, pause, reset };
+  return { elapsed, running, active: running, start, pause, reset };
 }
 
 export function formatTime(ms: number): string {
