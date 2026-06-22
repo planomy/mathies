@@ -5,15 +5,29 @@ interface SidebarTimerProps {
   visible: boolean;
   waiting: boolean;
   running: boolean;
+  onGo: () => void;
   onStop: () => void;
 }
 
-export function SidebarTimer({ elapsed, visible, waiting, running, onStop }: SidebarTimerProps) {
+export function SidebarTimer({
+  elapsed,
+  visible,
+  waiting,
+  running,
+  onGo,
+  onStop,
+}: SidebarTimerProps) {
   if (!visible) return null;
 
   const { minutes, seconds, centiseconds } = splitTime(elapsed);
-  const canStop = running || waiting;
-  const status = waiting ? 'Ready' : running ? 'Running' : 'Paused';
+  const active = running || waiting;
+  const status = waiting
+    ? 'Ready'
+    : running
+      ? 'Running'
+      : elapsed > 0
+        ? 'Paused'
+        : 'Ready';
 
   return (
     <div
@@ -51,15 +65,25 @@ export function SidebarTimer({ elapsed, visible, waiting, running, onStop }: Sid
 
         <button
           type="button"
-          className="sidebar-timer-stop"
-          onClick={onStop}
-          disabled={!canStop}
-          aria-label="Stop timer"
+          className={`sidebar-timer-action ${active ? 'sidebar-timer-stop' : 'sidebar-timer-go'}`}
+          onClick={active ? onStop : onGo}
+          aria-label={active ? 'Stop timer' : 'Start timer'}
         >
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <rect x="7" y="7" width="10" height="10" rx="1.5" />
-          </svg>
-          Stop
+          {active ? (
+            <>
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <rect x="7" y="7" width="10" height="10" rx="1.5" />
+              </svg>
+              Stop
+            </>
+          ) : (
+            <>
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <polygon points="5,3 19,12 5,21" />
+              </svg>
+              Go
+            </>
+          )}
         </button>
       </div>
     </div>

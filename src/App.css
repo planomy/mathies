@@ -187,7 +187,7 @@
   background: rgba(251, 191, 36, 0.2);
 }
 
-.sidebar-timer-stop {
+.sidebar-timer-action {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -195,9 +195,6 @@
   width: 100%;
   padding: 10px 14px;
   border-radius: var(--radius-sm);
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #ffffff;
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -208,25 +205,41 @@
     opacity var(--transition);
 }
 
-.sidebar-timer-stop svg {
+.sidebar-timer-go {
+  background: rgba(34, 197, 94, 0.9);
+  border: 1px solid rgba(187, 247, 208, 0.45);
+  color: #ffffff;
+}
+
+.sidebar-timer-go:hover {
+  background: rgba(22, 163, 74, 0.95);
+  border-color: rgba(187, 247, 208, 0.6);
+}
+
+.sidebar-timer-go:active {
+  transform: scale(0.98);
+}
+
+.sidebar-timer-stop {
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.sidebar-timer-action svg {
   width: 14px;
   height: 14px;
   flex-shrink: 0;
   opacity: 0.9;
 }
 
-.sidebar-timer-stop:hover:not(:disabled) {
+.sidebar-timer-stop:hover {
   background: rgba(239, 68, 68, 0.88);
   border-color: rgba(254, 202, 202, 0.45);
 }
 
-.sidebar-timer-stop:active:not(:disabled) {
+.sidebar-timer-stop:active {
   transform: scale(0.98);
-}
-
-.sidebar-timer-stop:disabled {
-  opacity: 0.38;
-  cursor: not-allowed;
 }
 
 .sidebar-nav {

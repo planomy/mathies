@@ -15,8 +15,8 @@ export function Timer({ running, waiting, onStart, onPause, onReset, focusMode }
   return (
     <div className="setup-controls">
       <p className="setup-controls-hint">
-        Configure your columns, then hit start. Questions appear in focus mode and the timer
-        begins in the sidebar after a one-second ready pause.
+        Configure your columns, then hit start. Questions appear in focus mode and the teacher
+        starts the sidebar timer with Go when ready.
       </p>
       <div className="setup-controls-buttons">
         {busy ? (

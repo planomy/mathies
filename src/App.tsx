@@ -53,16 +53,11 @@ export default function App() {
   );
 
   const handleStart = useCallback(() => {
-    if (!focusMode) {
-      setQuestions(buildAllQuestions(columns));
-      setShowAnswers(false);
-      setFocusMode(true);
-      setSeed((s) => s + 1);
-      startDelayed(1000);
-    } else {
-      start();
-    }
-  }, [focusMode, columns, start, startDelayed]);
+    setQuestions(buildAllQuestions(columns));
+    setShowAnswers(false);
+    setFocusMode(true);
+    setSeed((s) => s + 1);
+  }, [columns]);
 
   const handleReset = useCallback(() => {
     reset();
@@ -74,8 +69,15 @@ export default function App() {
     setQuestions(buildAllQuestions(columns));
     setShowAnswers(false);
     setSeed((s) => s + 1);
-    startDelayed(1000);
-  }, [reset, columns, startDelayed]);
+  }, [reset, columns]);
+
+  const handleTimerGo = useCallback(() => {
+    if (elapsed > 0) {
+      start();
+    } else {
+      startDelayed(1000);
+    }
+  }, [elapsed, start, startDelayed]);
 
   const handleNavigate = useCallback(
     (next: AppView) => {
@@ -109,6 +111,7 @@ export default function App() {
         onNavigate={handleNavigate}
         onToggleDark={toggleDark}
         onNewQuestions={handleNewQuestions}
+        onGoTimer={handleTimerGo}
         onStopTimer={pause}
       />
 

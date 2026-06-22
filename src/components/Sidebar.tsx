@@ -12,6 +12,7 @@ interface SidebarProps {
   onNavigate: (view: AppView) => void;
   onToggleDark: () => void;
   onNewQuestions: () => void;
+  onGoTimer: () => void;
   onStopTimer: () => void;
 }
 
@@ -25,6 +26,7 @@ export function Sidebar({
   onNavigate,
   onToggleDark,
   onNewQuestions,
+  onGoTimer,
   onStopTimer,
 }: SidebarProps) {
   return (
@@ -65,6 +67,7 @@ export function Sidebar({
         visible={timerVisible}
         waiting={timerWaiting}
         running={timerRunning}
+        onGo={onGoTimer}
         onStop={onStopTimer}
       />
 
