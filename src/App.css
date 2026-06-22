@@ -443,21 +443,22 @@
 /* ── Setup controls ── */
 
 .setup-controls {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: var(--purple-600);
+  border: 1px solid var(--purple-700);
   border-radius: var(--radius-lg);
   padding: 20px 24px;
   margin-bottom: 24px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
   flex-wrap: wrap;
+  color: #ffffff;
 }
 
 .setup-controls-hint {
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.92);
   font-size: 0.9rem;
   max-width: 520px;
   line-height: 1.5;
@@ -519,6 +520,40 @@
 .btn-setup-reset:hover {
   border-color: var(--purple-400);
   color: var(--text);
+}
+
+.setup-controls .btn-setup-start {
+  background: #ffffff;
+  color: var(--purple-700);
+  box-shadow: var(--shadow-sm);
+}
+
+.setup-controls .btn-setup-start:hover {
+  background: var(--purple-50);
+  box-shadow: var(--shadow-md);
+}
+
+.setup-controls .btn-setup-pause {
+  background: #ffffff;
+  color: #d97706;
+  box-shadow: var(--shadow-sm);
+}
+
+.setup-controls .btn-setup-pause:hover {
+  background: #fff7ed;
+  box-shadow: var(--shadow-md);
+}
+
+.setup-controls .btn-setup-reset {
+  background: transparent;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.setup-controls .btn-setup-reset:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.75);
+  color: #ffffff;
 }
 
 /* ── Columns grid ── */
