@@ -143,6 +143,7 @@ export default function App() {
                 <CheckButton
                   showAnswers={showAnswers}
                   onToggle={() => setShowAnswers((v) => !v)}
+                  onReset={handleReset}
                 />
               </div>
             )}

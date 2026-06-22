@@ -1,9 +1,10 @@
 interface CheckButtonProps {
   showAnswers: boolean;
   onToggle: () => void;
+  onReset: () => void;
 }
 
-export function CheckButton({ showAnswers, onToggle }: CheckButtonProps) {
+export function CheckButton({ showAnswers, onToggle, onReset }: CheckButtonProps) {
   return (
     <div className="check-section">
       <button
@@ -29,6 +30,13 @@ export function CheckButton({ showAnswers, onToggle }: CheckButtonProps) {
             Check answers
           </>
         )}
+      </button>
+      <button className="btn btn-setup btn-setup-reset btn-focus-reset" type="button" onClick={onReset}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+        </svg>
+        Reset
       </button>
     </div>
   );
