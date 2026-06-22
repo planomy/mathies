@@ -69,6 +69,14 @@ export default function App() {
     exitFocus();
   }, [reset, exitFocus]);
 
+  const handleFocusReset = useCallback(() => {
+    reset();
+    setQuestions(buildAllQuestions(columns));
+    setShowAnswers(false);
+    setSeed((s) => s + 1);
+    startDelayed(1000);
+  }, [reset, columns, startDelayed]);
+
   const handleNavigate = useCallback(
     (next: AppView) => {
       if (next !== 'practice' && focusMode) {
@@ -143,7 +151,7 @@ export default function App() {
                 <CheckButton
                   showAnswers={showAnswers}
                   onToggle={() => setShowAnswers((v) => !v)}
-                  onReset={handleReset}
+                  onReset={handleFocusReset}
                 />
               </div>
             )}
