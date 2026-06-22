@@ -116,7 +116,7 @@
 .sidebar-timer-face {
   display: grid;
   place-items: center;
-  min-height: 2.6rem;
+  min-height: 3.9rem;
   padding: 4px 0;
 }
 
@@ -132,13 +132,13 @@
 }
 
 .sidebar-timer-main {
-  font-size: 1.75rem;
+  font-size: 2.625rem;
   font-weight: 400;
   letter-spacing: 0.02em;
 }
 
 .sidebar-timer-sep {
-  font-size: 1.55rem;
+  font-size: 2.325rem;
   width: 0.45em;
   text-align: center;
   opacity: 0.9;
@@ -155,14 +155,14 @@
 }
 
 .sidebar-timer-cents {
-  font-size: 1.05rem;
+  font-size: 1.575rem;
   color: rgba(255, 255, 255, 0.62);
   margin-left: 1px;
 }
 
 .sidebar-timer-ready {
   font-family: var(--font-digital);
-  font-size: 1.15rem;
+  font-size: 1.725rem;
   font-weight: 400;
   letter-spacing: 0.28em;
   text-indent: 0.28em;
@@ -1371,15 +1371,15 @@
   }
 
   .sidebar-timer-main {
-    font-size: 1.5rem;
+    font-size: 2.25rem;
   }
 
   .sidebar-timer-sep {
-    font-size: 1.35rem;
+    font-size: 2.025rem;
   }
 
   .sidebar-timer-cents {
-    font-size: 0.95rem;
+    font-size: 1.425rem;
   }
 
   .main--focus {
@@ -1479,11 +1479,11 @@
   }
 
   .sidebar-timer-main {
-    font-size: 1.55rem;
+    font-size: 2.325rem;
   }
 
   .sidebar-timer-cents {
-    font-size: 1.05rem;
+    font-size: 1.575rem;
   }
 
   .columns-grid {
