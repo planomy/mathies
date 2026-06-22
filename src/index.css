@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Share+Tech+Mono&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --font: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-digital: 'Share Tech Mono', 'Courier New', monospace;
+
+  --purple-50: #f5f3ff;
+  --purple-100: #ede9fe;
+  --purple-200: #ddd6fe;
+  --purple-400: #a78bfa;
+  --purple-500: #8b5cf6;
+  --purple-600: #7c3aed;
+  --purple-700: #6d28d9;
+  --purple-800: #5b21b6;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+
+  --shadow-sm: 0 2px 8px rgba(91, 33, 182, 0.06);
+  --shadow-md: 0 4px 20px rgba(91, 33, 182, 0.1);
+  --shadow-lg: 0 8px 40px rgba(91, 33, 182, 0.14);
+
+  --transition: 0.2s ease;
+
+  --question-scale: 1;
+}
+
+[data-theme='light'] {
+  --bg: #f0edf8;
+  --bg-card: #ffffff;
+  --bg-sidebar: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);
+  --text: #1e1b2e;
+  --text-muted: #6b6580;
+  --text-inverse: #ffffff;
+  --border: #e8e4f0;
+  --input-bg: #f8f6fc;
+  --banner-bg: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 60%, #5b21b6 100%);
+  --answer-bg: #ede9fe;
+  --answer-text: #5b21b6;
+}
+
+[data-theme='dark'] {
+  --bg: #12101a;
+  --bg-card: #1e1a2e;
+  --bg-sidebar: linear-gradient(180deg, #4c1d95 0%, #3b0764 100%);
+  --text: #f0edf8;
+  --text-muted: #9d97b0;
+  --text-inverse: #ffffff;
+  --border: #2d2840;
+  --input-bg: #161222;
+  --banner-bg: linear-gradient(135deg, #6d28d9 0%, #4c1d95 60%, #3b0764 100%);
+  --answer-bg: #2d1f5e;
+  --answer-text: #c4b5fd;
+}
+
+html {
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  height: 100dvh;
+  overflow: hidden;
+  transition: background var(--transition), color var(--transition);
+}
+
+#root {
+  min-height: 100dvh;
+  height: 100dvh;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input {
+  font-family: inherit;
+}
+
+ol {
+  list-style: none;
+}
