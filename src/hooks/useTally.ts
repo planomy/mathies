@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { TallyDraft, TallyRecord } from '../types';
+import { DEFAULT_TALLY_DRAFT } from '../types';
 
 const RECORDS_KEY = 'mathies-tally';
 const ROSTER_KEY = 'mathies-roster';
@@ -92,6 +93,10 @@ export function useTally() {
       if (prev.includes(trimmed)) return prev;
       return [...prev, trimmed].sort((a, b) => a.localeCompare(b));
     });
+    setDrafts((prev) => ({
+      ...prev,
+      [trimmed]: prev[trimmed] ?? { ...DEFAULT_TALLY_DRAFT },
+    }));
     return true;
   }, []);
 
@@ -108,9 +113,9 @@ export function useTally() {
     setDrafts((prev) => ({
       ...prev,
       [name]: {
-        correct: patch.correct ?? prev[name]?.correct ?? '',
-        total: patch.total ?? prev[name]?.total ?? '',
-        time: patch.time ?? prev[name]?.time ?? '',
+        correct: patch.correct ?? prev[name]?.correct ?? DEFAULT_TALLY_DRAFT.correct,
+        total: patch.total ?? prev[name]?.total ?? DEFAULT_TALLY_DRAFT.total,
+        time: patch.time ?? prev[name]?.time ?? DEFAULT_TALLY_DRAFT.time,
       },
     }));
   }, []);

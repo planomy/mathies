@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Timer } from './components/Timer';
 import { Column } from './components/Column';
@@ -8,16 +8,23 @@ import { FontResizer } from './components/FontResizer';
 import { useTimer } from './hooks/useTimer';
 import { useDarkMode } from './hooks/useDarkMode';
 import { useFontSize } from './hooks/useFontSize';
-import { DEFAULT_COLUMNS, type AppView, type ColumnConfig, type Question } from './types';
+import { useYearLevel } from './hooks/useYearLevel';
+import { DEFAULT_COLUMNS, type AppView, type ColumnConfig, type Question, type YearLevel } from './types';
+import { generateMentalSet } from './utils/mentalSetGenerator';
 import { generateQuestions } from './utils/mathGenerator';
 import './App.css';
 
 const EMPTY_QUESTIONS: Question[][] = [[], [], [], []];
 
-function buildAllQuestions(columns: ColumnConfig[]): Question[][] {
-  return columns.map((col) =>
-    generateQuestions(col.questionCount, col.difficulty, col.operation),
-  );
+function buildColumnQuestions(col: ColumnConfig, yearLevel: YearLevel): Question[] {
+  if (col.questionMode === 'set') {
+    return generateMentalSet(yearLevel, col.id);
+  }
+  return generateQuestions(col.questionCount, col.id, yearLevel, col.operations);
+}
+
+function buildAllQuestions(columns: ColumnConfig[], yearLevel: YearLevel): Question[][] {
+  return columns.map((col) => buildColumnQuestions(col, yearLevel));
 }
 
 export default function App() {
@@ -29,6 +36,7 @@ export default function App() {
   const [seed, setSeed] = useState(0);
 
   const { dark, toggle: toggleDark } = useDarkMode();
+  const { yearLevel, setYearLevel } = useYearLevel();
   const { elapsed, running, start, pause, reset } = useTimer();
   const fontSize = useFontSize();
 
@@ -53,11 +61,11 @@ export default function App() {
   );
 
   const handleStart = useCallback(() => {
-    setQuestions(buildAllQuestions(columns));
+    setQuestions(buildAllQuestions(columns, yearLevel));
     setShowAnswers(false);
     setFocusMode(true);
     setSeed((s) => s + 1);
-  }, [columns]);
+  }, [columns, yearLevel]);
 
   const handleReset = useCallback(() => {
     reset();
@@ -66,10 +74,10 @@ export default function App() {
 
   const handleFocusReset = useCallback(() => {
     reset();
-    setQuestions(buildAllQuestions(columns));
+    setQuestions(buildAllQuestions(columns, yearLevel));
     setShowAnswers(false);
     setSeed((s) => s + 1);
-  }, [reset, columns]);
+  }, [reset, columns, yearLevel]);
 
   const handleTimerGo = useCallback(() => {
     start();
@@ -90,11 +98,6 @@ export default function App() {
     regenerate();
   }, [regenerate]);
 
-  const totalQuestions = useMemo(
-    () => columns.reduce((sum, col) => sum + col.questionCount, 0),
-    [columns],
-  );
-
   return (
     <div className="app">
       <Sidebar
@@ -103,6 +106,8 @@ export default function App() {
         elapsed={elapsed}
         timerVisible={focusMode}
         timerRunning={running}
+        yearLevel={yearLevel}
+        onYearLevelChange={setYearLevel}
         onNavigate={handleNavigate}
         onToggleDark={toggleDark}
         onNewQuestions={handleNewQuestions}
@@ -154,7 +159,7 @@ export default function App() {
             )}
           </>
         ) : (
-          <ClassTally defaultTimeMs={elapsed} defaultTotal={totalQuestions} />
+          <ClassTally />
         )}
       </main>
     </div>

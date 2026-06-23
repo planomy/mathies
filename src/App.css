@@ -270,6 +270,54 @@
   color: white;
 }
 
+.sidebar-year-level {
+  margin-top: 18px;
+  padding: 12px 10px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  flex-shrink: 0;
+}
+
+.sidebar-year-label {
+  display: block;
+  margin-bottom: 8px;
+  padding: 0 2px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.year-level-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.year-level-btn {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: left;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.year-level-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+
+.year-level-btn.active {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: white;
+}
+
 /* ── Main ── */
 
 .main {
@@ -688,6 +736,11 @@
   transition: border-color var(--transition);
 }
 
+.setting-field input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .setting-field input:focus {
   outline: none;
   border-color: var(--purple-500);
@@ -726,9 +779,21 @@
   border-color: var(--purple-400);
 }
 
+.op-btn-set.active {
+  color: #ffffff;
+  background: var(--purple-600);
+  border-color: var(--purple-700);
+}
+
 [data-theme='dark'] .op-btn.active {
   color: var(--answer-text);
   background: var(--answer-bg);
+  border-color: var(--purple-500);
+}
+
+[data-theme='dark'] .op-btn-set.active {
+  color: #ffffff;
+  background: var(--purple-600);
   border-color: var(--purple-500);
 }
 
@@ -766,6 +831,7 @@
   font-weight: 500;
   font-variant-numeric: tabular-nums;
   flex: 1;
+  line-height: 1.35;
 }
 
 .question-answer {
@@ -1038,21 +1104,21 @@
 .tally-entry {
   display: grid;
   grid-template-columns: 1fr 94px 62px;
-  gap: 10px;
+  gap: 6px;
   align-items: center;
-  padding-inline: 8px;
+  padding-inline: 6px;
 }
 
 .tally-entry-header {
   padding-top: 0;
-  padding-bottom: 8px;
-  font-size: 0.68rem;
+  padding-bottom: 5px;
+  font-size: 0.62rem;
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   border-bottom: 1px solid var(--border);
-  margin-bottom: 8px;
+  margin-bottom: 5px;
 }
 
 .tally-entry-header span:nth-child(2),
@@ -1064,12 +1130,12 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 5px;
+  margin-bottom: 8px;
 }
 
 .tally-entry {
-  padding-block: 10px;
+  padding-block: 6px;
   border-radius: var(--radius-sm);
   border: 1.5px solid var(--border);
   background: var(--input-bg);
@@ -1096,11 +1162,12 @@
 }
 
 .tally-entry-name {
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   font-weight: 700;
   text-align: left;
   color: var(--text);
-  padding: 4px 0;
+  padding: 2px 0;
+  line-height: 1.2;
 }
 
 .tally-entry-name:hover {
@@ -1131,26 +1198,27 @@
 .tally-entry-score input,
 .tally-entry-time input,
 .tally-field {
-  padding: 8px 8px;
+  padding: 5px 5px;
   border: 1.5px solid var(--border);
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--bg-card);
   color: var(--text);
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   font-weight: 600;
   text-align: center;
   font-variant-numeric: tabular-nums;
   appearance: none;
   -moz-appearance: textfield;
+  line-height: 1.2;
 }
 
 .tally-entry-score input,
 .tally-field {
-  width: 40px;
+  width: 36px;
 }
 
 .tally-entry-time input {
-  width: 48px;
+  width: 42px;
 }
 
 .tally-entry-score input:focus,
@@ -1162,7 +1230,7 @@
 .tally-entry-score span,
 .tally-entry-time span {
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: 0.72rem;
   font-weight: 500;
 }
 

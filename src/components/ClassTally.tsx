@@ -2,12 +2,8 @@ import { useEffect, useMemo, useRef, useState, type Ref } from 'react';
 import { ProgressChart } from './ProgressChart';
 import { useTally } from '../hooks/useTally';
 import type { TallyDraft, TallyRecord } from '../types';
+import { DEFAULT_TALLY_DRAFT } from '../types';
 import { formatShortDate, parseSecondsInput } from '../utils/timeInput';
-
-interface ClassTallyProps {
-  defaultTimeMs: number;
-  defaultTotal: number;
-}
 
 interface StudentRowProps {
   name: string;
@@ -58,6 +54,16 @@ function StudentRow({
     }
   };
 
+  const focusOnEnterOrTab = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    next: HTMLInputElement | null | undefined,
+  ) => {
+    if (e.key === 'Enter' || (e.key === 'Tab' && !e.shiftKey)) {
+      e.preventDefault();
+      next?.focus();
+    }
+  };
+
   return (
     <li className={`tally-entry ${flash ? 'saved' : ''} ${savedToday ? 'logged' : ''}`}>
       <button
@@ -80,12 +86,7 @@ function StudentRow({
           onChange={(e) => onCorrectChange(e.target.value.replace(/\D/g, ''))}
           onFocus={selectAllOnFocus}
           onClick={selectAllOnClick}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              totalRef.current?.focus();
-            }
-          }}
+          onKeyDown={(e) => focusOnEnterOrTab(e, totalRef.current)}
         />
         <span>/</span>
         <input
@@ -98,12 +99,7 @@ function StudentRow({
           onChange={(e) => onTotalChange(e.target.value.replace(/\D/g, ''))}
           onFocus={selectAllOnFocus}
           onClick={selectAllOnClick}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              timeRef.current?.focus();
-            }
-          }}
+          onKeyDown={(e) => focusOnEnterOrTab(e, timeRef.current)}
         />
       </div>
 
@@ -185,15 +181,14 @@ function groupRecordsBySession(records: TallyRecord[]): TallyRecord[][] {
 function buildDraftSession(
   roster: string[],
   drafts: Record<string, TallyDraft>,
-  defaultTotal: number,
 ): TallyRecord[] {
   const session: TallyRecord[] = [];
 
   for (const name of roster) {
     const draft = drafts[name];
-    const correct = draft?.correct ?? String(defaultTotal);
-    const total = draft?.total ?? String(defaultTotal);
-    const time = draft?.time ?? '';
+    const correct = draft?.correct ?? DEFAULT_TALLY_DRAFT.correct;
+    const total = draft?.total ?? DEFAULT_TALLY_DRAFT.total;
+    const time = draft?.time ?? DEFAULT_TALLY_DRAFT.time;
     const parsed = parseRowDraft(name, correct, total, time);
     if (!parsed) continue;
 
@@ -233,7 +228,6 @@ function buildClassChartData(
   records: TallyRecord[],
   roster: string[],
   drafts: Record<string, TallyDraft>,
-  defaultTotal: number,
   metric: 'accuracy' | 'speed',
 ): { label: string; value: number }[] {
   const rosterSet = new Set(roster);
@@ -248,7 +242,7 @@ function buildClassChartData(
   const allSessions = hasSavedToday
     ? sessions
     : [...sessions, ...(() => {
-        const draftSession = buildDraftSession(roster, drafts, defaultTotal);
+        const draftSession = buildDraftSession(roster, drafts);
         return draftSession.length > 0 ? [draftSession] : [];
       })()];
 
@@ -260,7 +254,7 @@ function buildClassChartData(
 
 type ChartView = 'class' | 'student';
 
-export function ClassTally({ defaultTotal }: ClassTallyProps) {
+export function ClassTally() {
   const { records, roster, drafts, addRecord, addStudent, updateDraft, setDraft, clearAll } =
     useTally();
   const [newName, setNewName] = useState('');
@@ -269,6 +263,14 @@ export function ClassTally({ defaultTotal }: ClassTallyProps) {
   const [flashName, setFlashName] = useState<string | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const rowInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const addNameInputRef = useRef<HTMLInputElement>(null);
+  const pendingFocusAddName = useRef(false);
+
+  useEffect(() => {
+    if (!pendingFocusAddName.current) return;
+    pendingFocusAddName.current = false;
+    addNameInputRef.current?.focus();
+  }, [roster]);
 
   useEffect(() => {
     if (!showClearConfirm) return;
@@ -293,17 +295,17 @@ export function ClassTally({ defaultTotal }: ClassTallyProps) {
 
   const accuracyData = useMemo(() => {
     if (chartView === 'class') {
-      return buildClassChartData(records, roster, drafts, defaultTotal, 'accuracy');
+      return buildClassChartData(records, roster, drafts, 'accuracy');
     }
     return chartStudent ? buildChartData(records, chartStudent, 'accuracy') : [];
-  }, [records, roster, drafts, defaultTotal, chartView, chartStudent]);
+  }, [records, roster, drafts, chartView, chartStudent]);
 
   const speedData = useMemo(() => {
     if (chartView === 'class') {
-      return buildClassChartData(records, roster, drafts, defaultTotal, 'speed');
+      return buildClassChartData(records, roster, drafts, 'speed');
     }
     return chartStudent ? buildChartData(records, chartStudent, 'speed') : [];
-  }, [records, roster, drafts, defaultTotal, chartView, chartStudent]);
+  }, [records, roster, drafts, chartView, chartStudent]);
 
   const chartTitle =
     chartView === 'class'
@@ -334,16 +336,12 @@ export function ClassTally({ defaultTotal }: ClassTallyProps) {
   const getDraftValues = (name: string) => {
     const saved = drafts[name];
     if (!saved) {
-      return {
-        correct: String(defaultTotal),
-        total: String(defaultTotal),
-        time: '',
-      };
+      return { ...DEFAULT_TALLY_DRAFT };
     }
     return {
-      correct: saved.correct ?? String(defaultTotal),
-      total: saved.total ?? String(defaultTotal),
-      time: saved.time ?? '',
+      correct: saved.correct ?? DEFAULT_TALLY_DRAFT.correct,
+      total: saved.total ?? DEFAULT_TALLY_DRAFT.total,
+      time: saved.time ?? DEFAULT_TALLY_DRAFT.time,
     };
   };
 
@@ -378,6 +376,7 @@ export function ClassTally({ defaultTotal }: ClassTallyProps) {
   const handleAddName = (e: React.FormEvent) => {
     e.preventDefault();
     if (addStudent(newName)) {
+      pendingFocusAddName.current = true;
       setNewName('');
     }
   };
@@ -448,13 +447,14 @@ export function ClassTally({ defaultTotal }: ClassTallyProps) {
           {roster.length === 0 ? (
             <form className="tally-add-name tally-add-name--solo" onSubmit={handleAddName}>
               <input
+                ref={addNameInputRef}
                 type="text"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="Add a student name…"
                 autoFocus
               />
-              <button type="submit">Add</button>
+              <button type="submit" tabIndex={-1}>Add</button>
             </form>
           ) : (
             <>
@@ -484,7 +484,12 @@ export function ClassTally({ defaultTotal }: ClassTallyProps) {
                       onTotalChange={(value) => updateDraft(name, { total: value })}
                       onTimeChange={(value) => updateDraft(name, { time: value })}
                       onSelect={selectStudent}
-                      onTimeTab={() => rowInputRefs.current[index + 1]?.focus()}
+                      onTimeTab={() => {
+                        const next = rowInputRefs.current[index + 1];
+                        if (!next) return;
+                        next.focus();
+                        next.select();
+                      }}
                     />
                   );
                 })}
@@ -496,12 +501,13 @@ export function ClassTally({ defaultTotal }: ClassTallyProps) {
 
               <form className="tally-add-name" onSubmit={handleAddName}>
                 <input
+                  ref={addNameInputRef}
                   type="text"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="Add another student…"
                 />
-                <button type="submit">Add</button>
+                <button type="submit" tabIndex={-1}>Add</button>
               </form>
             </>
           )}

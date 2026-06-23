@@ -1,6 +1,9 @@
-import type { AppView } from '../types';
+import type { AppView, YearLevel } from '../types';
+import { YEAR_LEVEL_LABELS } from '../types';
 import { assetUrl } from '../utils/assetUrl';
 import { SidebarTimer } from './SidebarTimer';
+
+const YEAR_LEVELS: YearLevel[] = ['y4', 'y5', 'y6'];
 
 interface SidebarProps {
   view: AppView;
@@ -8,6 +11,8 @@ interface SidebarProps {
   elapsed: number;
   timerVisible: boolean;
   timerRunning: boolean;
+  yearLevel: YearLevel;
+  onYearLevelChange: (year: YearLevel) => void;
   onNavigate: (view: AppView) => void;
   onToggleDark: () => void;
   onNewQuestions: () => void;
@@ -21,6 +26,8 @@ export function Sidebar({
   elapsed,
   timerVisible,
   timerRunning,
+  yearLevel,
+  onYearLevelChange,
   onNavigate,
   onToggleDark,
   onNewQuestions,
@@ -59,6 +66,22 @@ export function Sidebar({
           Class tally
         </button>
       </nav>
+
+      <div className="sidebar-year-level">
+        <span className="sidebar-year-label">Year level</span>
+        <div className="year-level-buttons">
+          {YEAR_LEVELS.map((year) => (
+            <button
+              key={year}
+              type="button"
+              className={`year-level-btn ${yearLevel === year ? 'active' : ''}`}
+              onClick={() => onYearLevelChange(year)}
+            >
+              {YEAR_LEVEL_LABELS[year]}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <SidebarTimer
         elapsed={elapsed}
