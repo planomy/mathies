@@ -37,7 +37,7 @@ export function Sidebar({
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
-        <img src={assetUrl('mathies-logo.png?v=5')} alt="Mathies" className="brand-logo" />
+        <img src={assetUrl('mathies-logo.png?v=6')} alt="Mathies" className="brand-logo" />
       </div>
 
       <nav className="sidebar-nav">
