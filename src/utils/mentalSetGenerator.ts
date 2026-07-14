@@ -96,12 +96,18 @@ function buildNumber(digits: number): number {
 }
 
 function integerAverageTriple(min: number, max: number): [number, number, number] {
-  const average = randInt(min, max);
-  const total = average * 3;
-  const a = randInt(Math.max(min, total - max * 2), Math.min(max, total - min * 2));
-  const remaining = total - a;
-  const b = randInt(Math.max(min, remaining - max), Math.min(max, remaining - min));
-  return [a, b, remaining - b];
+  // Keep retrying until the three values aren't all identical (avoids "avg of 20, 20, 20").
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    const average = randInt(min, max);
+    const total = average * 3;
+    const a = randInt(Math.max(min, total - max * 2), Math.min(max, total - min * 2));
+    const remaining = total - a;
+    const b = randInt(Math.max(min, remaining - max), Math.min(max, remaining - min));
+    const c = remaining - b;
+    if (!(a === b && b === c)) return [a, b, c];
+  }
+  const average = randInt(min, Math.max(min, max - 1));
+  return [average - 1, average, average + 1];
 }
 
 function expandedNotation(value: number): string {
@@ -346,15 +352,18 @@ function slot10Portion(ctx: GenContext): PromptQuestion {
   const usePercent = ctx.columnId >= 2;
 
   if (!usePercent) {
+    // Starters/Rising: keep unit-friendly fractions (no awkward 6/8 of n).
     const dens = tierOf(ctx, [
       [2, 3, 4, 5],
-      [2, 3, 4, 5, 8],
+      [2, 3, 4, 5],
       [2, 3, 4, 5, 8, 10],
       [3, 4, 5, 8, 10],
     ] as const);
     const denominator = pick(dens);
     const numerator =
-      ctx.columnId === 0 ? pick([1, Math.max(1, Math.floor(denominator / 2))]) : randInt(1, denominator - 1);
+      ctx.columnId === 0
+        ? 1
+        : pick([1, Math.min(denominator - 1, Math.max(1, Math.floor(denominator / 2)))]);
     const whole = wholeForFraction(
       numerator,
       denominator,
@@ -530,7 +539,7 @@ function slot19Time(ctx: GenContext): PromptQuestion {
     const minute = 60 - minsTo;
     const hour = targetHour - 1;
     return prompt(
-      `${minsTo} to ${targetHour}`,
+      `${minsTo} to ${targetHour} as digital time`,
       `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`,
     );
   }
