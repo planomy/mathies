@@ -249,19 +249,41 @@ function slot08Comparison(ctx: GenContext): PromptQuestion {
 
 function slot09Fraction(ctx: GenContext): PromptQuestion {
   if (variant(ctx) === 0) {
-    const whole = randInt(1, colPick(ctx, [3, 5, 7, 9]));
-    const denominator = [2, 3, 4, 5, 8][randInt(0, ctx.columnId === 0 ? 2 : 4)];
+    // Mixed → improper; dens and wholes grow with tier
+    const whole = randInt(1, colPick(ctx, [2, 4, 6, 9]));
+    const dens = (
+      [
+        [2, 3, 4],
+        [2, 3, 4, 5],
+        [2, 3, 4, 5, 6, 8],
+        [3, 4, 5, 6, 8, 10],
+      ] as const
+    )[ctx.columnId];
+    const denominator = dens[randInt(0, dens.length - 1)];
     const numerator = randInt(1, denominator - 1);
     const improper = whole * denominator + numerator;
     return prompt(`${whole} ${numerator}/${denominator} as an improper fraction`, `${improper}/${denominator}`);
   }
 
-  const denominator = [2, 4, 5, 10][randInt(0, 3)];
-  const numerator = randInt(1, denominator - 1);
-  const factor = gcd(numerator, denominator);
+  // Equivalent fractions: always scale a reduced form so left/right dens differ
+  const dens = (
+    [
+      [2, 3, 4],
+      [2, 3, 4, 5],
+      [2, 3, 4, 5, 6, 8],
+      [3, 4, 5, 6, 8, 10, 12],
+    ] as const
+  )[ctx.columnId];
+  const reducedDenom = dens[randInt(0, dens.length - 1)];
+  let reducedNum = randInt(1, reducedDenom - 1);
+  const g = gcd(reducedNum, reducedDenom);
+  reducedNum /= g;
+  const simplifiedDenom = reducedDenom / g;
+  const maxScale = colPick(ctx, [2, 3, 4, 5]);
+  const scale = randInt(2, Math.max(2, maxScale));
   return prompt(
-    `${numerator}/${denominator} = □/${denominator / factor}`,
-    numerator / factor,
+    `${reducedNum * scale}/${simplifiedDenom * scale} = □/${simplifiedDenom}`,
+    reducedNum,
   );
 }
 
