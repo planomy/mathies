@@ -347,6 +347,25 @@
   align-items: stretch;
 }
 
+.main--focus .columns-grid--n1 {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 560px;
+  width: 100%;
+  margin-inline: auto;
+}
+
+.main--focus .columns-grid--n2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.main--focus .columns-grid--n3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.main--focus .columns-grid--n4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .main--focus .column-card {
   min-height: 0;
   overflow: hidden;
@@ -623,7 +642,56 @@
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  transition: background var(--transition), border-color var(--transition);
+  transition: background var(--transition), border-color var(--transition), opacity var(--transition);
+}
+
+.column-card--inactive {
+  opacity: 0.48;
+}
+
+.column-card--inactive .column-active-toggle {
+  opacity: 1;
+}
+
+.column-active-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-card) 88%, var(--purple-100));
+  border: 1px solid var(--border);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--purple-700);
+  cursor: pointer;
+  user-select: none;
+}
+
+[data-theme='dark'] .column-active-toggle {
+  color: var(--answer-text);
+  background: color-mix(in srgb, var(--bg-card) 80%, var(--answer-bg));
+}
+
+.column-active-toggle input {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--purple-600);
+  margin: 0;
+  cursor: pointer;
+}
+
+.column-active-toggle input:disabled {
+  cursor: not-allowed;
+}
+
+.column-settings.is-disabled {
+  pointer-events: none;
+  opacity: 0.55;
 }
 
 .column-card--focus {
@@ -673,7 +741,7 @@
 
 .column-card:not(.column-card--focus) .column-mascot {
   position: absolute;
-  top: 0;
+  top: 28px;
   right: 0;
   height: 76px;
   max-width: 48%;
@@ -1525,13 +1593,14 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .main--focus .columns-grid {
+  .main--focus .columns-grid--n4 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 1024px) {
-  .main--focus .columns-grid {
+  .main--focus .columns-grid--n3,
+  .main--focus .columns-grid--n4 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

@@ -8,13 +8,25 @@ interface ColumnProps {
   questions: Question[];
   showAnswers: boolean;
   focusMode: boolean;
+  canDeactivate: boolean;
   onConfigChange: (id: number, updates: Partial<ColumnConfig>) => void;
+  onToggleActive: (id: number) => void;
 }
 
-export function Column({ config, questions, showAnswers, focusMode, onConfigChange }: ColumnProps) {
+export function Column({
+  config,
+  questions,
+  showAnswers,
+  focusMode,
+  canDeactivate,
+  onConfigChange,
+  onToggleActive,
+}: ColumnProps) {
   const isSetMode = config.questionMode === 'set';
+  const inactive = !config.active;
 
   const toggleOperation = (op: DrillOp) => {
+    if (inactive) return;
     const selected = config.operations;
     if (selected.includes(op)) {
       if (selected.length === 1) return;
@@ -32,27 +44,61 @@ export function Column({ config, questions, showAnswers, focusMode, onConfigChan
   };
 
   return (
-    <div className={`column-card ${focusMode ? 'column-card--focus' : ''}`}>
+    <div
+      className={[
+        'column-card',
+        focusMode ? 'column-card--focus' : '',
+        !focusMode && inactive ? 'column-card--inactive' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
       <div className="column-header">
         <div className="column-header-text">
           <h2>{config.label}</h2>
           {!focusMode && (
             <span className="difficulty-badge">
-              {isSetMode ? '20-question mental set' : COLUMN_DRILL_HINTS[config.id]}
+              {inactive
+                ? 'Off for this session'
+                : isSetMode
+                  ? '20-question mental set'
+                  : COLUMN_DRILL_HINTS[config.id]}
             </span>
           )}
         </div>
+
         {!focusMode && (
-          <img
-            src={assetUrl(COLUMN_MASCOTS[config.id])}
-            alt=""
-            className="column-mascot"
-          />
+          <>
+            <label
+              className="column-active-toggle"
+              title={
+                inactive
+                  ? `Include ${config.label}`
+                  : canDeactivate
+                    ? `Hide ${config.label}`
+                    : 'Keep at least one group on'
+              }
+            >
+              <input
+                type="checkbox"
+                checked={config.active}
+                disabled={config.active && !canDeactivate}
+                onChange={() => onToggleActive(config.id)}
+                aria-label={`Include ${config.label}`}
+              />
+              <span>On</span>
+            </label>
+            <img
+              src={assetUrl(COLUMN_MASCOTS[config.id])}
+              alt=""
+              className="column-mascot"
+            />
+          </>
         )}
       </div>
 
       {!focusMode && (
-        <div className="column-settings">
+        <div className={`column-settings ${inactive ? 'is-disabled' : ''}`} aria-disabled={inactive}>
           <label className="setting-field">
             <span>Questions</span>
             <input
@@ -60,7 +106,7 @@ export function Column({ config, questions, showAnswers, focusMode, onConfigChan
               min={1}
               max={30}
               value={isSetMode ? MENTAL_SET_SIZE : config.questionCount}
-              disabled={isSetMode}
+              disabled={isSetMode || inactive}
               onChange={(e) =>
                 onConfigChange(config.id, {
                   questionCount: Math.max(1, Math.min(30, Number(e.target.value) || 1)),
@@ -78,6 +124,7 @@ export function Column({ config, questions, showAnswers, focusMode, onConfigChan
                   type="button"
                   className={`op-btn ${!isSetMode && config.operations.includes(op) ? 'active' : ''}`}
                   onClick={() => toggleOperation(op)}
+                  disabled={inactive}
                   aria-pressed={!isSetMode && config.operations.includes(op)}
                 >
                   {op}
@@ -87,6 +134,7 @@ export function Column({ config, questions, showAnswers, focusMode, onConfigChan
                 type="button"
                 className={`op-btn op-btn-set ${isSetMode ? 'active' : ''}`}
                 title="20-question mental maths set"
+                disabled={inactive}
                 onClick={() =>
                   onConfigChange(config.id, {
                     questionMode: 'set',

@@ -15,6 +15,28 @@ import { generateQuestions } from './utils/mathGenerator';
 import './App.css';
 
 const EMPTY_QUESTIONS: Question[][] = [[], [], [], []];
+const COLUMN_ACTIVE_KEY = 'mathies-column-active';
+
+function loadColumns(): ColumnConfig[] {
+  try {
+    const raw = localStorage.getItem(COLUMN_ACTIVE_KEY);
+    const saved = raw ? (JSON.parse(raw) as Record<string, boolean>) : {};
+    return DEFAULT_COLUMNS.map((col) => ({
+      ...col,
+      active: saved[String(col.id)] !== false,
+    }));
+  } catch {
+    return DEFAULT_COLUMNS.map((col) => ({ ...col }));
+  }
+}
+
+function persistColumnActive(columns: ColumnConfig[]) {
+  const map: Record<string, boolean> = {};
+  columns.forEach((col) => {
+    map[String(col.id)] = col.active;
+  });
+  localStorage.setItem(COLUMN_ACTIVE_KEY, JSON.stringify(map));
+}
 
 function buildColumnQuestions(col: ColumnConfig, yearLevel: YearLevel): Question[] {
   if (col.questionMode === 'set') {
@@ -24,12 +46,12 @@ function buildColumnQuestions(col: ColumnConfig, yearLevel: YearLevel): Question
 }
 
 function buildAllQuestions(columns: ColumnConfig[], yearLevel: YearLevel): Question[][] {
-  return columns.map((col) => buildColumnQuestions(col, yearLevel));
+  return columns.map((col) => (col.active ? buildColumnQuestions(col, yearLevel) : []));
 }
 
 export default function App() {
   const [view, setView] = useState<AppView>('practice');
-  const [columns, setColumns] = useState<ColumnConfig[]>(DEFAULT_COLUMNS);
+  const [columns, setColumns] = useState<ColumnConfig[]>(loadColumns);
   const [questions, setQuestions] = useState<Question[][]>(EMPTY_QUESTIONS);
   const [showAnswers, setShowAnswers] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
@@ -39,6 +61,8 @@ export default function App() {
   const { yearLevel, setYearLevel } = useYearLevel();
   const { elapsed, running, start, pause, reset } = useTimer();
   const fontSize = useFontSize();
+
+  const activeCount = columns.filter((col) => col.active).length;
 
   const exitFocus = useCallback(() => {
     setFocusMode(false);
@@ -60,7 +84,20 @@ export default function App() {
     [],
   );
 
+  const handleToggleActive = useCallback((id: number) => {
+    setColumns((prev) => {
+      const target = prev.find((col) => col.id === id);
+      if (!target) return prev;
+      if (target.active && prev.filter((col) => col.active).length <= 1) return prev;
+      const next = prev.map((col) => (col.id === id ? { ...col, active: !col.active } : col));
+      persistColumnActive(next);
+      return next;
+    });
+    setShowAnswers(false);
+  }, []);
+
   const handleStart = useCallback(() => {
+    if (!columns.some((col) => col.active)) return;
     setQuestions(buildAllQuestions(columns, yearLevel));
     setShowAnswers(false);
     setFocusMode(true);
@@ -127,17 +164,25 @@ export default function App() {
               />
             )}
 
-            <div className="columns-grid" key={seed}>
-              {columns.map((col, i) => (
-                <Column
-                  key={col.id}
-                  config={col}
-                  questions={questions[i]}
-                  showAnswers={showAnswers}
-                  focusMode={focusMode}
-                  onConfigChange={handleConfigChange}
-                />
-              ))}
+            <div
+              className={`columns-grid ${focusMode ? `columns-grid--n${activeCount}` : ''}`}
+              key={seed}
+            >
+              {columns.map((col, i) => {
+                if (focusMode && !col.active) return null;
+                return (
+                  <Column
+                    key={col.id}
+                    config={col}
+                    questions={questions[i]}
+                    showAnswers={showAnswers}
+                    focusMode={focusMode}
+                    canDeactivate={activeCount > 1}
+                    onConfigChange={handleConfigChange}
+                    onToggleActive={handleToggleActive}
+                  />
+                );
+              })}
             </div>
 
             {focusMode && (

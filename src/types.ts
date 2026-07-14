@@ -31,6 +31,8 @@ export interface ColumnConfig {
   questionCount: number;
   operations: DrillOp[];
   questionMode: QuestionMode;
+  /** When false, column is faded in setup and hidden in focus mode. */
+  active: boolean;
 }
 
 export const YEAR_LEVEL_LABELS: Record<YearLevel, string> = {
@@ -56,6 +58,7 @@ export const DEFAULT_COLUMNS: ColumnConfig[] = [
     questionCount: 10,
     operations: [...ALL_DRILL_OPS],
     questionMode: 'drill',
+    active: true,
   },
   {
     id: 1,
@@ -64,6 +67,7 @@ export const DEFAULT_COLUMNS: ColumnConfig[] = [
     questionCount: 10,
     operations: [...ALL_DRILL_OPS],
     questionMode: 'drill',
+    active: true,
   },
   {
     id: 2,
@@ -72,6 +76,7 @@ export const DEFAULT_COLUMNS: ColumnConfig[] = [
     questionCount: 10,
     operations: [...ALL_DRILL_OPS],
     questionMode: 'drill',
+    active: true,
   },
   {
     id: 3,
@@ -80,6 +85,7 @@ export const DEFAULT_COLUMNS: ColumnConfig[] = [
     questionCount: 10,
     operations: [...ALL_DRILL_OPS],
     questionMode: 'drill',
+    active: true,
   },
 ];
 
