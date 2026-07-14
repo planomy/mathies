@@ -3,7 +3,7 @@ import { ProgressChart } from './ProgressChart';
 import { useTally } from '../hooks/useTally';
 import type { TallyDraft, TallyRecord } from '../types';
 import { DEFAULT_TALLY_DRAFT } from '../types';
-import { formatShortDate, parseSecondsInput } from '../utils/timeInput';
+import { formatShortDate, normalizeSecondsInput, parseSecondsInput } from '../utils/timeInput';
 
 interface StudentRowProps {
   name: string;
@@ -50,7 +50,15 @@ function StudentRow({
   const handleTimeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' || (e.key === 'Tab' && !e.shiftKey)) {
       e.preventDefault();
+      normalizeTime();
       onTimeTab();
+    }
+  };
+
+  const normalizeTime = () => {
+    const normalized = normalizeSecondsInput(timeInput);
+    if (normalized && normalized !== timeInput) {
+      onTimeChange(normalized);
     }
   };
 
@@ -107,14 +115,16 @@ function StudentRow({
         <input
           ref={timeRef}
           type="text"
-          inputMode="numeric"
+          inputMode="decimal"
           className="tally-field"
           value={timeInput}
-          placeholder="56"
-          aria-label={`${name} time in seconds`}
-          onChange={(e) => onTimeChange(e.target.value.replace(/[^\d:]/g, ''))}
+          placeholder="3.12"
+          aria-label={`${name} time — seconds, or minutes.seconds like 3.12`}
+          title="Seconds (56) or minutes.seconds (3.12 → 192)"
+          onChange={(e) => onTimeChange(e.target.value.replace(/[^\d:.]/g, ''))}
           onFocus={selectAllOnFocus}
           onClick={selectAllOnClick}
+          onBlur={normalizeTime}
           onKeyDown={handleTimeKeyDown}
         />
         <span>s</span>
