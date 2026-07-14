@@ -107,7 +107,13 @@ export function Column({ config, questions, showAnswers, focusMode, onConfigChan
             <li key={i} className="question-item">
               <span className="question-num">{i + 1}.</span>
               <span className="question-text">{getQuestionText(q)}</span>
-              {showAnswers && <span className="question-answer">{formatAnswer(q)}</span>}
+              <span
+                className={`question-answer ${showAnswers ? 'is-visible' : ''}`}
+                aria-hidden={!showAnswers}
+                title={showAnswers ? formatAnswer(q) : undefined}
+              >
+                {formatAnswer(q)}
+              </span>
             </li>
           ))}
         </ol>

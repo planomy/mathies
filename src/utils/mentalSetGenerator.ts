@@ -231,11 +231,16 @@ function slot06PlaceValue(ctx: GenContext): PromptQuestion {
 
 function slot07Decimal(ctx: GenContext): PromptQuestion {
   if (variant(ctx) === 0) {
-    const numerator = randInt(1, colPick(ctx, [5, 9, 9, 9]));
+    // Tenths: keep a single digit so "0.n as a fraction" stays /10
+    const maxNum = Math.min(9, colPick(ctx, [5, 9, 9, 9]));
+    const numerator = randInt(1, Math.max(1, maxNum));
     return prompt(`0.${numerator} as a fraction`, `${numerator}/10`);
   }
 
-  const hundredths = randInt(colPick(ctx, [10, 20, 30, 40]), colPick(ctx, [50, 75, 90, 99]));
+  // Hundredths → percentage: keep two-digit hundredths (10–99)
+  const lo = Math.min(99, colPick(ctx, [10, 20, 30, 40]));
+  const hi = Math.min(99, colPick(ctx, [50, 75, 90, 99]));
+  const hundredths = randInt(lo, Math.max(lo, hi));
   return prompt(`0.${hundredths} as a percentage`, `${hundredths}%`);
 }
 
