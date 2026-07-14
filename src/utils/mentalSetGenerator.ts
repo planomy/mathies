@@ -1,4 +1,5 @@
 import type { PromptQuestion, YearLevel } from '../types';
+import { MENTAL_SET_SIZE } from '../types';
 
 type GenContext = {
   year: YearLevel;
@@ -598,7 +599,12 @@ const SLOTS = [
   slot20Geometry,
 ];
 
-export function generateMentalSet(year: YearLevel, columnId: number): PromptQuestion[] {
+export function generateMentalSet(
+  year: YearLevel,
+  columnId: number,
+  count: number = MENTAL_SET_SIZE,
+): PromptQuestion[] {
   const ctx: GenContext = { year, columnId };
-  return SLOTS.map((slot) => slot(ctx));
+  const size = Math.max(1, Math.min(SLOTS.length, Math.round(count)));
+  return SLOTS.slice(0, size).map((slot) => slot(ctx));
 }

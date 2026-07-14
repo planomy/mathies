@@ -48,7 +48,13 @@ export const COLUMN_DRILL_HINTS: Record<number, string> = {
   3: 'Bigger numbers',
 };
 
+export const MENTAL_SET_MIN = 10;
 export const MENTAL_SET_SIZE = 20;
+
+export function clampMentalSetCount(count: number): number {
+  if (!Number.isFinite(count)) return MENTAL_SET_SIZE;
+  return Math.max(MENTAL_SET_MIN, Math.min(MENTAL_SET_SIZE, Math.round(count)));
+}
 
 export const DEFAULT_COLUMNS: ColumnConfig[] = [
   {

@@ -1,5 +1,12 @@
 import type { ColumnConfig, DrillOp, Question } from '../types';
-import { ALL_DRILL_OPS, COLUMN_DRILL_HINTS, COLUMN_MASCOTS, MENTAL_SET_SIZE } from '../types';
+import {
+  ALL_DRILL_OPS,
+  COLUMN_DRILL_HINTS,
+  COLUMN_MASCOTS,
+  MENTAL_SET_MIN,
+  MENTAL_SET_SIZE,
+  clampMentalSetCount,
+} from '../types';
 import { assetUrl } from '../utils/assetUrl';
 import { formatAnswer, getQuestionText } from '../utils/questionDisplay';
 
@@ -24,6 +31,7 @@ export function Column({
 }: ColumnProps) {
   const isSetMode = config.questionMode === 'set';
   const inactive = !config.active;
+  const setCount = clampMentalSetCount(config.questionCount);
 
   const toggleOperation = (op: DrillOp) => {
     if (inactive) return;
@@ -41,6 +49,31 @@ export function Column({
       questionMode: 'drill',
       operations: [...selected, op],
     });
+  };
+
+  const handleQuestionCountChange = (raw: string) => {
+    const parsed = Number(raw);
+    if (!Number.isFinite(parsed)) return;
+
+    if (isSetMode) {
+      // Allow typing below 10 mid-edit; clamp the floor on blur.
+      onConfigChange(config.id, {
+        questionCount: Math.max(1, Math.min(MENTAL_SET_SIZE, Math.round(parsed))),
+      });
+      return;
+    }
+
+    onConfigChange(config.id, {
+      questionCount: Math.max(1, Math.min(30, Math.round(parsed))),
+    });
+  };
+
+  const handleQuestionCountBlur = () => {
+    if (!isSetMode) return;
+    const next = clampMentalSetCount(config.questionCount);
+    if (next !== config.questionCount) {
+      onConfigChange(config.id, { questionCount: next });
+    }
   };
 
   return (
@@ -61,7 +94,7 @@ export function Column({
               {inactive
                 ? 'Off for this session'
                 : isSetMode
-                  ? '20-question mental set'
+                  ? `${setCount}-question mental set`
                   : COLUMN_DRILL_HINTS[config.id]}
             </span>
           )}
@@ -103,15 +136,13 @@ export function Column({
             <span>Questions</span>
             <input
               type="number"
-              min={1}
-              max={30}
-              value={isSetMode ? MENTAL_SET_SIZE : config.questionCount}
-              disabled={isSetMode || inactive}
-              onChange={(e) =>
-                onConfigChange(config.id, {
-                  questionCount: Math.max(1, Math.min(30, Number(e.target.value) || 1)),
-                })
-              }
+              min={isSetMode ? MENTAL_SET_MIN : 1}
+              max={isSetMode ? MENTAL_SET_SIZE : 30}
+              value={config.questionCount}
+              disabled={inactive}
+              title={isSetMode ? `Mental set length (${MENTAL_SET_MIN}–${MENTAL_SET_SIZE})` : undefined}
+              onChange={(e) => handleQuestionCountChange(e.target.value)}
+              onBlur={handleQuestionCountBlur}
             />
           </label>
 
@@ -133,12 +164,12 @@ export function Column({
               <button
                 type="button"
                 className={`op-btn op-btn-set ${isSetMode ? 'active' : ''}`}
-                title="20-question mental maths set"
+                title={`Mental maths set (${MENTAL_SET_MIN}–${MENTAL_SET_SIZE} questions)`}
                 disabled={inactive}
                 onClick={() =>
                   onConfigChange(config.id, {
                     questionMode: 'set',
-                    questionCount: MENTAL_SET_SIZE,
+                    questionCount: clampMentalSetCount(config.questionCount),
                   })
                 }
               >

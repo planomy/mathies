@@ -9,7 +9,7 @@ import { useTimer } from './hooks/useTimer';
 import { useDarkMode } from './hooks/useDarkMode';
 import { useFontSize } from './hooks/useFontSize';
 import { useYearLevel } from './hooks/useYearLevel';
-import { DEFAULT_COLUMNS, type AppView, type ColumnConfig, type Question, type YearLevel } from './types';
+import { DEFAULT_COLUMNS, clampMentalSetCount, type AppView, type ColumnConfig, type Question, type YearLevel } from './types';
 import { generateMentalSet } from './utils/mentalSetGenerator';
 import { generateQuestions } from './utils/mathGenerator';
 import './App.css';
@@ -40,7 +40,7 @@ function persistColumnActive(columns: ColumnConfig[]) {
 
 function buildColumnQuestions(col: ColumnConfig, yearLevel: YearLevel): Question[] {
   if (col.questionMode === 'set') {
-    return generateMentalSet(yearLevel, col.id);
+    return generateMentalSet(yearLevel, col.id, clampMentalSetCount(col.questionCount));
   }
   return generateQuestions(col.questionCount, col.id, yearLevel, col.operations);
 }
