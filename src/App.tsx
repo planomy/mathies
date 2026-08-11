@@ -42,7 +42,10 @@ function buildColumnQuestions(col: ColumnConfig, yearLevel: YearLevel): Question
   if (col.questionMode === 'set') {
     return generateMentalSet(yearLevel, col.id, clampMentalSetCount(col.questionCount));
   }
-  return generateQuestions(col.questionCount, col.id, yearLevel, col.operations);
+  return generateQuestions(col.questionCount, col.operations, {
+    left: { min: col.leftMin, max: col.leftMax },
+    right: { min: col.rightMin, max: col.rightMax },
+  });
 }
 
 function buildAllQuestions(columns: ColumnConfig[], yearLevel: YearLevel): Question[][] {

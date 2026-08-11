@@ -30,6 +30,10 @@ export interface ColumnConfig {
   difficulty: Difficulty;
   questionCount: number;
   operations: DrillOp[];
+  leftMin: number;
+  leftMax: number;
+  rightMin: number;
+  rightMax: number;
   questionMode: QuestionMode;
   /** When false, column is faded in setup and hidden in focus mode. */
   active: boolean;
@@ -39,13 +43,6 @@ export const YEAR_LEVEL_LABELS: Record<YearLevel, string> = {
   y4: 'Year 4',
   y5: 'Year 5',
   y6: 'Year 6',
-};
-
-export const COLUMN_DRILL_HINTS: Record<number, string> = {
-  0: 'Numbers 1–5',
-  1: 'Numbers 3–12',
-  2: 'Numbers 5–15',
-  3: 'Bigger numbers',
 };
 
 export const MENTAL_SET_MIN = 10;
@@ -63,6 +60,10 @@ export const DEFAULT_COLUMNS: ColumnConfig[] = [
     difficulty: 'easy',
     questionCount: 10,
     operations: [...ALL_DRILL_OPS],
+    leftMin: 1,
+    leftMax: 5,
+    rightMin: 1,
+    rightMax: 5,
     questionMode: 'drill',
     active: true,
   },
@@ -72,6 +73,10 @@ export const DEFAULT_COLUMNS: ColumnConfig[] = [
     difficulty: 'easy',
     questionCount: 10,
     operations: [...ALL_DRILL_OPS],
+    leftMin: 3,
+    leftMax: 12,
+    rightMin: 3,
+    rightMax: 12,
     questionMode: 'drill',
     active: true,
   },
@@ -81,6 +86,10 @@ export const DEFAULT_COLUMNS: ColumnConfig[] = [
     difficulty: 'medium',
     questionCount: 10,
     operations: [...ALL_DRILL_OPS],
+    leftMin: 5,
+    leftMax: 15,
+    rightMin: 5,
+    rightMax: 15,
     questionMode: 'drill',
     active: true,
   },
@@ -90,6 +99,10 @@ export const DEFAULT_COLUMNS: ColumnConfig[] = [
     difficulty: 'hard',
     questionCount: 10,
     operations: [...ALL_DRILL_OPS],
+    leftMin: 8,
+    leftMax: 20,
+    rightMin: 8,
+    rightMax: 20,
     questionMode: 'drill',
     active: true,
   },

@@ -1,7 +1,6 @@
 import type { ColumnConfig, DrillOp, Question } from '../types';
 import {
   ALL_DRILL_OPS,
-  COLUMN_DRILL_HINTS,
   COLUMN_MASCOTS,
   MENTAL_SET_MIN,
   MENTAL_SET_SIZE,
@@ -32,6 +31,11 @@ export function Column({
   const isSetMode = config.questionMode === 'set';
   const inactive = !config.active;
   const setCount = clampMentalSetCount(config.questionCount);
+  const leftLow = Math.min(config.leftMin, config.leftMax);
+  const leftHigh = Math.max(config.leftMin, config.leftMax);
+  const rightLow = Math.min(config.rightMin, config.rightMax);
+  const rightHigh = Math.max(config.rightMin, config.rightMax);
+  const rangeOperator = config.operations.length === 1 ? config.operations[0] : 'mixed';
 
   const toggleOperation = (op: DrillOp) => {
     if (inactive) return;
@@ -76,6 +80,17 @@ export function Column({
     }
   };
 
+  const handleRangeChange = (
+    field: 'leftMin' | 'leftMax' | 'rightMin' | 'rightMax',
+    raw: string,
+  ) => {
+    const parsed = Number(raw);
+    if (!Number.isFinite(parsed)) return;
+    onConfigChange(config.id, {
+      [field]: Math.max(0, Math.min(100, Math.round(parsed))),
+    });
+  };
+
   return (
     <div
       className={[
@@ -95,7 +110,7 @@ export function Column({
                 ? 'Off for this session'
                 : isSetMode
                   ? `${setCount}-question mental set`
-                  : COLUMN_DRILL_HINTS[config.id]}
+                  : `${leftLow}–${leftHigh} ${rangeOperator} ${rightLow}–${rightHigh}`}
             </span>
           )}
         </div>
@@ -177,6 +192,63 @@ export function Column({
               </button>
             </div>
           </div>
+
+          {!isSetMode && (
+            <div className="setting-field range-setting">
+              <span>Number ranges</span>
+              <div className="range-controls">
+                <div className="range-pair" aria-label="First number range">
+                  <small>First</small>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={config.leftMin}
+                    disabled={inactive}
+                    aria-label="First number minimum"
+                    onChange={(e) => handleRangeChange('leftMin', e.target.value)}
+                  />
+                  <span>to</span>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={config.leftMax}
+                    disabled={inactive}
+                    aria-label="First number maximum"
+                    onChange={(e) => handleRangeChange('leftMax', e.target.value)}
+                  />
+                </div>
+
+                <strong className="range-operator" aria-hidden="true">
+                  {config.operations.length === 1 ? config.operations[0] : '◆'}
+                </strong>
+
+                <div className="range-pair" aria-label="Second number range">
+                  <small>Second</small>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={config.rightMin}
+                    disabled={inactive}
+                    aria-label="Second number minimum"
+                    onChange={(e) => handleRangeChange('rightMin', e.target.value)}
+                  />
+                  <span>to</span>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={config.rightMax}
+                    disabled={inactive}
+                    aria-label="Second number maximum"
+                    onChange={(e) => handleRangeChange('rightMax', e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

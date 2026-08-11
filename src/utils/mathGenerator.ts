@@ -1,34 +1,24 @@
-import type { DrillOp, DrillQuestion, YearLevel } from '../types';
+import type { DrillOp, DrillQuestion } from '../types';
+
+interface NumberRange {
+  min: number;
+  max: number;
+}
+
+export interface FactRanges {
+  left: NumberRange;
+  right: NumberRange;
+}
 
 function randInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function yearFactor(year: YearLevel): number {
-  return { y4: 0.82, y5: 1, y6: 1.15 }[year];
-}
-
-function scaledRange(
-  columnId: number,
-  year: YearLevel,
-  mins: readonly [number, number, number, number],
-  maxs: readonly [number, number, number, number],
-): { min: number; max: number } {
-  const factor = yearFactor(year);
-  const min = Math.max(1, Math.round(mins[columnId] * factor));
-  const max = Math.max(min + 1, Math.round(maxs[columnId] * factor));
-  return { min, max };
-}
-
-function getRange(
-  columnId: number,
-  year: YearLevel,
-  op: DrillOp,
-): { min: number; max: number } {
-  if (op === '+' || op === '-') {
-    return scaledRange(columnId, year, [1, 3, 5, 8], [5, 12, 15, 20]);
-  }
-  return scaledRange(columnId, year, [1, 2, 2, 3], [5, 9, 12, 12]);
+function normaliseRange(range: NumberRange): NumberRange {
+  return {
+    min: Math.min(range.min, range.max),
+    max: Math.max(range.min, range.max),
+  };
 }
 
 function pickOp(operations: DrillOp[]): DrillOp {
@@ -36,44 +26,57 @@ function pickOp(operations: DrillOp[]): DrillOp {
 }
 
 function generateOne(
-  columnId: number,
-  year: YearLevel,
   operations: DrillOp[],
+  ranges: FactRanges,
 ): DrillQuestion {
   const op = pickOp(operations);
-  const { min, max } = getRange(columnId, year, op);
+  const left = normaliseRange(ranges.left);
+  const right = normaliseRange(ranges.right);
+  const a = randInt(left.min, left.max);
+  const b = randInt(right.min, right.max);
 
   switch (op) {
     case '+': {
-      const a = randInt(min, max);
-      const b = randInt(min, max);
       return { kind: 'drill', a, b, operation: '+', answer: a + b };
     }
     case '-': {
-      const a = randInt(min, max);
-      const b = randInt(min, a);
       return { kind: 'drill', a, b, operation: '-', answer: a - b };
     }
     case '×': {
-      const a = randInt(min, max);
-      const b = randInt(min, max);
       return { kind: 'drill', a, b, operation: '×', answer: a * b };
     }
     case '÷': {
-      const b = randInt(Math.max(min, 1), max);
-      const quotient = randInt(min, max);
-      const a = b * quotient;
-      return { kind: 'drill', a, b, operation: '÷', answer: quotient };
+      for (let attempt = 0; attempt < 50; attempt += 1) {
+        const dividend = randInt(left.min, left.max);
+        const divisor = randInt(right.min, right.max);
+        if (divisor !== 0 && dividend % divisor === 0) {
+          return {
+            kind: 'drill',
+            a: dividend,
+            b: divisor,
+            operation: '÷',
+            answer: dividend / divisor,
+          };
+        }
+      }
+
+      const divisor = b === 0 ? 1 : b;
+      return {
+        kind: 'drill',
+        a,
+        b: divisor,
+        operation: '÷',
+        answer: Number((a / divisor).toFixed(2)),
+      };
     }
   }
 }
 
 export function generateQuestions(
   count: number,
-  columnId: number,
-  year: YearLevel,
   operations: DrillOp[],
+  ranges: FactRanges,
 ): DrillQuestion[] {
   const ops = operations.length > 0 ? operations : (['+'] as DrillOp[]);
-  return Array.from({ length: count }, () => generateOne(columnId, year, ops));
+  return Array.from({ length: count }, () => generateOne(ops, ranges));
 }

@@ -816,6 +816,50 @@
   border-color: var(--purple-500);
 }
 
+.range-setting {
+  margin-top: 2px;
+}
+
+.range-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: end;
+  gap: 6px;
+}
+
+.range-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 4px;
+}
+
+.range-pair small {
+  grid-column: 1 / -1;
+  color: var(--text-muted);
+  font-size: 0.66rem;
+  font-weight: 600;
+}
+
+.range-pair span {
+  color: var(--text-muted);
+  font-size: 0.68rem;
+}
+
+.range-pair input {
+  width: 100%;
+  min-width: 0;
+  padding: 7px 5px;
+  text-align: center;
+}
+
+.range-operator {
+  align-self: end;
+  padding-bottom: 8px;
+  color: var(--purple-600);
+  font-size: 0.9rem;
+}
+
 .op-buttons {
   display: flex;
   flex-wrap: wrap;
